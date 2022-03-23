@@ -1,0 +1,117 @@
+﻿@using System.Net.Mail
+@using Blazored.Toast
+@inject IJSRuntime js
+@page "/contact"
+@inject NavigationManager NavigationManager
+
+
+<PageTitle>Contact</PageTitle>
+<div class="alert" style="@MessageSend">
+  <span class="closebtn"></span>
+  Wiadomość została wysłana.
+</div>
+<div class="alertNull" style="@NullInput">
+  <span class="closebtn"></span>
+Uzupełnij wszystkie pola
+</div>
+<div class="container justify-content-center h-100">
+    <div class="h-100 row  align-items-center ">
+        <div class="col-md-12">
+            <div class="well well-sm">
+                <form id="myform" @onsubmit="Sending">
+                 <h1 class="text-success text-center mt-1">Wyślij mi wiadomość!</h1>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="name" class="text-success">
+                                Imię</label>
+                            <input type="text" class="form-control" id="name" @bind="name" placeholder="Wpisz imię" required="required"  autocomplete="off"/>
+                        </div>
+                        <br/>
+                        <div class="form-group">
+                            <label for="Surname" class="text-success">
+                                Nazwisko</label>
+                            <div class="input-group">
+                                <span class="input-group-addon"><span class="glyphicon glyphicon-envelope"></span>
+                                </span>
+                                <input type="text" class="form-control" id="surname" @bind="surname" placeholder="Wpisz nazwisko" required="required" autocomplete="off"/></div>
+                        </div>
+                                                <br/>
+                         <div class="form-group">
+                            <label for="Subject" class="text-success">
+                                Temat</label>
+                            <input type="text" class="form-control" id="subject" @bind="subject" placeholder="Wpisz temat wiadomości" required="required" autocomplete="off"/>
+                        </div>
+                    </div>
+                    <div class="col-md-6 ">
+                        <div class="form-group form-media-queries">
+                            <label for="name" class="text-success">
+                                Wiadomość</label>
+                            <textarea name="message" id="message" @bind="tekscior" class="form-control" rows="9" cols="24" required="required" 
+                                placeholder="Wpisz treść twojej wiadomości"></textarea>
+                        </div>
+                    </div>
+                    <br/>
+                    <div class="col-md-12 form-media-queries">
+                        <button @onclick="SendMail"  type="submit" class="btn btn-primary pull-right" id="btnContactUs">
+                            Wyślij wiadomość</button>
+                    </div>
+                   </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string Message{ get; set; }
+    private string name{ get; set; }
+    private string surname{ get; set; }
+    private string subject{ get; set; }
+    private string tekscior{ get; set; }
+    string MessageSend = "Display: none;";
+    string NullInput = "Display:none";
+    private void Sending()
+    {
+        MessageSend = "Display:block";
+        name = "";
+        surname = "";
+        subject = "";
+        tekscior = "";
+    }
+
+    private void SendMail()
+    {
+        if(!String.IsNullOrWhiteSpace(tekscior) && !String.IsNullOrWhiteSpace(name) && !String.IsNullOrWhiteSpace(surname) && !String.IsNullOrWhiteSpace(subject) ){
+            try
+            {
+                using (MailMessage mail = new MailMessage())
+                {
+                    mail.From = new MailAddress("conradconrad.adress@gmail.com");
+                    mail.To.Add("kedziora.adres@gmail.com");
+                    mail.Subject = subject;
+                    mail.Body = name + " " + surname + "<br/>" + tekscior;
+                    mail.IsBodyHtml = true;
+
+                    using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
+                    {
+                        smtp.Credentials = new System.Net.NetworkCredential("conradconrad.adress@gmail.com", "551558555K0123l");
+                        smtp.EnableSsl = true;
+                        smtp.Send(mail);
+                        Message = "Mail send";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Message = ex.Message;
+            }
+           
+        }
+        else
+        {
+        NullInput = "Display:block; animation: 1s ease-out 0s 1 slideInFromTop; ";
+        }
+    }
+
+}
